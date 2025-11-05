@@ -1,0 +1,246 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Greenhouse Creative</title>
+  <style>
+    :root{
+      --bg:#FAF7F2; --ink:#1A1A18; --olive:#556B2F;
+    }
+    body{margin:0;background:var(--bg);color:var(--ink);font-family:ui-sans-serif,system-ui,Segoe UI,Roboto,Helvetica,Arial;}
+    .container{max-width:72rem;margin:0 auto;padding:0 1.5rem;}
+    .btn{display:inline-block;padding:.75rem 1.25rem;border-radius:1rem;border:1px solid #000;background:#000;color:#fff;text-decoration:none}
+    .btn.alt{background:transparent;color:inherit;border-color:#0003}
+    .card{background:#fff;opacity:.9;border-radius:1rem;padding:1rem}
+    .grid{display:grid;gap:.75rem}
+    @media (min-width:768px){.grid-3{grid-template-columns:repeat(3,1fr)}}
+    .chip{display:inline-flex;align-items:center;gap:.5rem;background:#fffC;padding:.25rem .6rem;border-radius:999px;font-size:.7rem;letter-spacing:.08em;text-transform:uppercase}
+    .dot{width:.5rem;height:.5rem;border-radius:999px;background:var(--olive)}
+    .hero{padding:3.5rem 0 2.5rem}
+    .texture{aspect-ratio:16/7;border-radius:1.5rem;box-shadow:inset 0 0 40px #0002;background:
+      radial-gradient(circle at 30% 30%, rgba(85,107,47,.25), transparent 40%),
+      radial-gradient(circle at 70% 70%, rgba(0,0,0,.08), transparent 40%);
+      margin-bottom:2rem}
+    footer{opacity:.8;font-size:.9rem;padding:2.5rem 0}
+    /* Modal */
+    .overlay{position:fixed;inset:0;display:grid;place-items:center;background:#0008;padding:1rem}
+    .modal{max-width:40rem;width:100%;background:#fff;border-radius:1.25rem;box-shadow:0 10px 40px #0006;padding:1.25rem}
+    .row{display:grid;gap:.75rem}
+    @media (min-width:768px){.row-2{grid-template-columns:repeat(2,1fr)}}
+    input, select, textarea{width:100%;padding:.6rem .75rem;border-radius:.75rem;border:1px solid #0003;font:inherit}
+    label{font-size:.9rem;margin-bottom:.25rem;display:block}
+    .muted{opacity:.8}
+    .err{color:#b00020;font-size:.9rem;margin-top:.25rem}
+  </style>
+
+  <!-- React via CDN (no build tools needed) -->
+  <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+  <script src="https://unpkg.com/babel-standalone@6/babel.min.js"></script>
+</head>
+<body>
+  <div id="root"></div>
+
+  <script type="text/babel">
+    function App(){
+      const EVENT = {
+        title: "GREENHOUSE CREATIVE — Weekend Workshop",
+        dates: "November 15–16, 2025",
+        time: "11:00 AM – 4:00 PM",
+        location: "One on One Recording, North Hollywood",
+      };
+      const FORMSPREE_ENDPOINT = "https://formspree.io/f/mldoqbqa";
+      const DONATE = {
+        stripe: "", // optional
+        paypal: "https://paypal.me/NatalieDreyfuss",
+      };
+
+      const params = new URLSearchParams(window.location.search);
+      const [open, setOpen] = React.useState(false);
+      const [loading, setLoading] = React.useState(false);
+      const [submitted, setSubmitted] = React.useState(false);
+      const [error, setError] = React.useState("");
+      const [form, setForm] = React.useState({
+        name: params.get("name") || "",
+        email: params.get("email") || "",
+        role: params.get("role") || "",
+        attending: "Both Days",
+        accessibility: "",
+        notes: ""
+      });
+
+      function onChange(e){
+        const {name, value} = e.target;
+        setForm(f => ({...f, [name]: value}));
+      }
+
+      async function onSubmit(e){
+        e.preventDefault();
+        setLoading(true); setError("");
+        try{
+          const res = await fetch(FORMSPREE_ENDPOINT, {
+            method: "POST",
+            headers: {"Content-Type":"application/json"},
+            body: JSON.stringify({
+              ...form,
+              source: "greenhousecreative-landing",
+              utm: Object.fromEntries(params.entries()),
+            })
+          });
+          if(!res.ok) throw new Error("Submission failed");
+          setSubmitted(true);
+        }catch(err){
+          setError("Sorry — something went wrong. Please try again or email hello@greenhousecreative.space");
+        }finally{
+          setLoading(false);
+        }
+      }
+
+      return (
+        <>
+          <header className="container hero">
+            <div className="chip"><span className="dot"></span> Greenhouse Creative</div>
+            <h1 style={{fontWeight:600, fontSize:"clamp(1.9rem,3.8vw,3rem)", lineHeight:1.1, margin:"0.6rem 0 0"}}>
+              {EVENT.title}
+            </h1>
+            <p className="muted" style={{marginTop:".75rem", fontSize:"1.05rem"}}>
+              A small, curated room for actors, filmmakers, and artists to reconnect with the work and each other.
+            </p>
+
+            <div className="grid grid-3" style={{marginTop:"1rem"}}>
+              <div className="card">
+                <div style={{fontWeight:600}}>When</div>
+                <div className="muted">{EVENT.dates}</div>
+                <div className="muted" style={{opacity:.6}}>{EVENT.time}</div>
+              </div>
+              <div className="card">
+                <div style={{fontWeight:600}}>Where</div>
+                <div className="muted">{EVENT.location}</div>
+              </div>
+              <div className="card">
+                <div style={{fontWeight:600}}>Format</div>
+                <div className="muted">Cold reads, filmed work, authentic reflections. It’s about play, not polish.</div>
+              </div>
+            </div>
+
+            <div style={{marginTop:"1.25rem", display:"flex", gap:".8rem", flexWrap:"wrap"}}>
+              <a className="btn" onClick={() => setOpen(true)} href="javascript:void(0)">RSVP — Save My Spot</a>
+              <a className="alt" href="#donate" style={{textDecoration:"underline", textUnderlineOffset:"3px"}}>Prefer to donate now?</a>
+            </div>
+          </header>
+
+          <section className="container">
+            <div className="texture"></div>
+          </section>
+
+          <section className="container" style={{padding:"2rem 0"}}>
+            <h2 style={{fontWeight:600, fontSize:"1.25rem"}}>What to expect</h2>
+            <p className="muted" style={{marginTop:".5rem", lineHeight:1.6}}>
+              Not a panel. Not a self-help seminar. Just artists doing the work — with cameras rolling so you can see what shifts.
+              Show up messy and willing. We’ll keep it small on purpose.
+            </p>
+            <div style={{marginTop:".75rem"}}>
+              <a className="btn" onClick={() => setOpen(true)} href="javascript:void(0)">RSVP — Save My Spot</a>
+            </div>
+          </section>
+
+          <section id="donate" className="container" style={{padding:"2rem 0", borderTop:"1px solid #0002"}}>
+            <h2 style={{fontWeight:600, fontSize:"1.25rem"}}>Sliding-scale support</h2>
+            <p className="muted" style={{marginTop:".5rem", lineHeight:1.6}}>
+              This first Greenhouse pop-up is a one-time, donation-based intensive — an experiment in what happens when artistry and self-work share the same space.
+              Future Greenhouse weekends will move to full tuition (around $1,200 for the weekend).
+              If you’re able to help contribute to the cost of the space, we’re asking $500. Pay what you’re able — your presence matters more than the number.
+            </p>
+            <div style={{marginTop:".75rem", display:"flex", gap:".6rem", flexWrap:"wrap"}}>
+              {DONATE.paypal && <a className="btn alt" href={DONATE.paypal} target="_blank" rel="noreferrer">Donate via PayPal</a>}
+            </div>
+          </section>
+
+          <footer className="container">
+            <div>Questions? Email <a href="mailto:hello@greenhousecreative.space" style={{textDecoration:"underline"}}>hello@greenhousecreative.space</a></div>
+            <div style={{marginTop:".25rem"}}>© {new Date().getFullYear()} Greenhouse Creative</div>
+          </footer>
+
+          {open && (
+            <div className="overlay" role="dialog" aria-modal="true">
+              <div className="modal">
+                <div style={{display:"flex",justifyContent:"space-between",alignItems:"center"}}>
+                  <h3 style={{margin:0,fontWeight:600}}>RSVP — Save My Spot</h3>
+                  <button onClick={()=>setOpen(false)} style="background:none;border:none;font-size:1.1rem;cursor:pointer">✕</button>
+                </div>
+
+                {submitted ? (
+                  <div style={{marginTop:"1rem"}}>
+                    <p style={{lineHeight:1.6}}>
+                      <strong>Thank you so much.</strong><br/>
+                      It means a lot to have you with us — see you Saturday.
+                    </p>
+                    <div style={{display:"flex",gap:".5rem", marginTop:".75rem"}}>
+                      <a href="#donate" className="btn alt" onclick="document.querySelector('.overlay')?.remove()">Donate</a>
+                      <a className="btn" href="javascript:void(0)" onClick={()=>setOpen(false)}>Done</a>
+                    </div>
+                  </div>
+                ) : (
+                  <form onSubmit={onSubmit} className="row" style={{marginTop:".75rem"}}>
+                    <div className="row row-2">
+                      <div>
+                        <label>Name</label>
+                        <input required name="name" value={form.name} onChange={onChange} placeholder="First & last name" />
+                      </div>
+                      <div>
+                        <label>Email</label>
+                        <input required type="email" name="email" value={form.email} onChange={onChange} placeholder="name@email.com" />
+                      </div>
+                    </div>
+
+                    <div className="row row-2">
+                      <div>
+                        <label>Role</label>
+                        <select name="role" value={form.role} onChange={onChange}>
+                          <option value="">Choose…</option>
+                          <option>Actor</option>
+                          <option>Filmmaker</option>
+                          <option>Writer</option>
+                          <option>Other</option>
+                        </select>
+                      </div>
+                      <div>
+                        <label>Attending</label>
+                        <select name="attending" value={form.attending} onChange={onChange}>
+                          <option>Both Days</option>
+                          <option>Saturday Only</option>
+                          <option>Sunday Only</option>
+                        </select>
+                      </div>
+                    </div>
+
+                    <div>
+                      <label>Accessibility Needs</label>
+                      <textarea name="accessibility" value={form.accessibility} onChange={onChange} rows="2" placeholder="Anything we should know to support you"></textarea>
+                    </div>
+
+                    <div>
+                      <label>Notes (optional)</label>
+                      <textarea name="notes" value={form.notes} onChange={onChange} rows="2" placeholder="Any thoughts you'd like to share"></textarea>
+                    </div>
+
+                    {error && <div className="err">{error}</div>}
+
+                    <button type="submit" className="btn" disabled={loading}>
+                      {loading ? "Sending..." : "Submit RSVP"}
+                    </button>
+                  </form>
+                )}
+              </div>
+            </div>
+          )}
+        </>
+      );
+    }
+
+    const root = ReactDOM.createRoot(document.getElementById('root'));
+    root.render(<App />);
+  </script>
+</body>
+</html>
