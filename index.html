@@ -5,9 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Greenhouse Creative</title>
   <style>
-    :root{
-      --bg:#FAF7F2; --ink:#1A1A18; --olive:#556B2F;
-    }
+    :root{ --bg:#FAF7F2; --ink:#1A1A18; --olive:#556B2F; }
     body{margin:0;background:var(--bg);color:var(--ink);font-family:ui-sans-serif,system-ui,Segoe UI,Roboto,Helvetica,Arial;}
     .container{max-width:72rem;margin:0 auto;padding:0 1.5rem;}
     .btn{display:inline-block;padding:.75rem 1.25rem;border-radius:1rem;border:1px solid #000;background:#000;color:#fff;text-decoration:none}
@@ -23,7 +21,6 @@
       radial-gradient(circle at 70% 70%, rgba(0,0,0,.08), transparent 40%);
       margin-bottom:2rem}
     footer{opacity:.8;font-size:.9rem;padding:2.5rem 0}
-    /* Modal */
     .overlay{position:fixed;inset:0;display:grid;place-items:center;background:#0008;padding:1rem}
     .modal{max-width:40rem;width:100%;background:#fff;border-radius:1.25rem;box-shadow:0 10px 40px #0006;padding:1.25rem}
     .row{display:grid;gap:.75rem}
@@ -34,7 +31,7 @@
     .err{color:#b00020;font-size:.9rem;margin-top:.25rem}
   </style>
 
-  <!-- React via CDN (no build tools needed) -->
+  <!-- React + Babel (no build step) -->
   <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
   <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
   <script src="https://unpkg.com/babel-standalone@6/babel.min.js"></script>
@@ -51,10 +48,7 @@
         location: "One on One Recording, North Hollywood",
       };
       const FORMSPREE_ENDPOINT = "https://formspree.io/f/mldoqbqa";
-      const DONATE = {
-        stripe: "", // optional
-        paypal: "https://paypal.me/NatalieDreyfuss",
-      };
+      const DONATE = { stripe: "", paypal: "https://paypal.me/NatalieDreyfuss" };
 
       const params = new URLSearchParams(window.location.search);
       const [open, setOpen] = React.useState(false);
@@ -167,7 +161,11 @@
               <div className="modal">
                 <div style={{display:"flex",justifyContent:"space-between",alignItems:"center"}}>
                   <h3 style={{margin:0,fontWeight:600}}>RSVP — Save My Spot</h3>
-                  <button onClick={()=>setOpen(false)} style="background:none;border:none;font-size:1.1rem;cursor:pointer">✕</button>
+                  <button
+                    onClick={()=>setOpen(false)}
+                    aria-label="Close"
+                    style={{background:"none",border:"none",fontSize:"1.1rem",cursor:"pointer"}}
+                  >✕</button>
                 </div>
 
                 {submitted ? (
@@ -177,7 +175,11 @@
                       It means a lot to have you with us — see you Saturday.
                     </p>
                     <div style={{display:"flex",gap:".5rem", marginTop:".75rem"}}>
-                      <a href="#donate" className="btn alt" onclick="document.querySelector('.overlay')?.remove()">Donate</a>
+                      <a
+                        href="#donate"
+                        className="btn alt"
+                        onClick={(e)=>{ e.preventDefault(); setOpen(false); }}
+                      >Donate</a>
                       <a className="btn" href="javascript:void(0)" onClick={()=>setOpen(false)}>Done</a>
                     </div>
                   </div>
