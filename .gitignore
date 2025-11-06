@@ -1,0 +1,20 @@
+# Node / Next.js / Vite defaults
+node_modules/
+.next/
+dist/
+out/
+build/
+.vercel/
+.DS_Store
+# Common archives and binaries
+*.zip
+*.png
+*.jpg
+*.jpeg
+*.gif
+*.webp
+*.mp4
+*.mov
+*.psd
+*.woff
+*.woff2
